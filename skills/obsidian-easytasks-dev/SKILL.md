@@ -18,16 +18,21 @@ Use this skill when changing the reusable implementation under `EasyTasks/`.
 
 1. Read `EasyTasks/README.md`.
 2. Confirm the change belongs to the generic package, not the vault-specific implementation.
-3. Keep filenames, headings, and markers consistent with the starter kit contract.
-4. Preserve these invariants:
+3. If a feature is first implemented in the WRITINGS vault, explicitly assess whether any part of it is generic enough for `EasyTasks/`.
+4. When the WRITINGS change includes reusable logic, patterns, docs, or workflows, update `EasyTasks` in the same turn.
+5. Only sync the generic portion.
+   - Do not copy personal tags, project-specific wording, vault-only paths, or private task content into `EasyTasks`.
+6. Keep filenames, headings, and markers consistent with the starter kit contract.
+7. Preserve these invariants:
    - Template tasks stay out of metrics.
    - Dataview task toggles remain interactive.
    - Missing daily notes are created from the template.
    - Fixed-task markers remain unchanged.
-5. After editing, reconcile documentation in the same turn.
+8. After editing, reconcile documentation in the same turn.
 
 ## Validation
 
 - Parse JSON samples.
 - Run `node --check EasyTasks/starter-kit/sync-dashboard/server.js`.
 - Verify README paths and commands still exist.
+- Verify any newly synced change is still generic and does not reintroduce WRITINGS-specific content.

@@ -1,31 +1,63 @@
 # EasyTasks
 
-EasyTasks is a reusable Obsidian task dashboard starter extracted from the vault-specific implementation in this repository. It packages a generic daily note workflow, a Dataview-based dashboard note, fixed-task sync, a lightweight HTML control panel, and Codex skills for ongoing maintenance.
+EasyTasks is a reusable task dashboard starter for Obsidian. It combines daily notes, Dataview queries, fixed-task synchronization, and an optional HTML control panel into a single workflow that can be copied into a new or existing vault.
 
-EasyTasks 是从本仓库现有的 Obsidian 任务仪表盘系统中抽离出来的通用 starter。它包含一套可复用的日报任务流、基于 Dataview 的仪表盘笔记、固定任务同步机制、一个轻量 HTML 控制台，以及配套的 Codex skills。
+EasyTasks 是一个面向 Obsidian 的通用任务仪表盘 starter。它把每日日报、Dataview 查询、固定任务同步，以及可选的 HTML 控制台整合为一套可直接部署到新旧 Vault 中的任务工作流。
 
-## What Is Included
+## Overview | 简介
+
+### English
+
+EasyTasks is designed for people who want a practical task system inside Obsidian without building everything from scratch. It keeps markdown files as the source of truth, supports Dataview-based dashboarding, lets you add tasks directly into daily notes, and provides an optional local web panel for interacting with the same markdown files outside Obsidian.
+
+### 中文
+
+EasyTasks 适合希望在 Obsidian 内构建可用任务系统、但不想从零搭建整套方案的用户。它以 markdown 文件作为唯一真实数据源，支持基于 Dataview 的任务仪表盘、将任务直接写入日报，并提供一个可选的本地 Web 控制台，用于在 Obsidian 外操作同一批 markdown 任务。
+
+## Key Features | 核心能力
+
+- Daily notes remain the source of truth.
+- Dataview dashboard queries exclude template files by default.
+- Task checkboxes in the dashboard can write back to source files.
+- Missing daily notes can be created automatically from the template.
+- Fixed tasks are managed from one JSON file and synced into both template and daily notes.
+- An optional local HTML dashboard can read and write the same markdown task files.
+
+- 每日日报仍是任务数据的唯一真实来源。
+- 仪表盘默认排除模板目录中的任务，避免统计污染。
+- 仪表盘中的任务勾选可直接回写源文件。
+- 如果目标日报不存在，可以按模板自动创建。
+- 固定任务统一由一个 JSON 文件管理，并同步到模板和指定日报。
+- 可选的本地 HTML 控制台可直接读写同一批 markdown 任务文件。
+
+## Package Contents | 包含内容
 
 - `starter-kit/dashboard/Task Dashboard.md`
-  - Generic dashboard note with overview cards, quick add, open-task list, and due queue.
+  - Main dashboard note for Obsidian.
 - `starter-kit/Templates/Daily Note Template.md`
-  - Daily note template with fixed-task block markers and a stable insertion section.
+  - Daily note template used by the quick-add flow.
 - `starter-kit/DOC/fixed-tasks.json`
-  - Example fixed-task source file for template sync and daily sync.
-- `starter-kit/.obsidian/*.sample.json`
-  - Sample Obsidian settings for Daily Notes, Templates, and DataviewJS.
+  - Source of fixed tasks.
+- `starter-kit/.obsidian/daily-notes.sample.json`
+  - Sample Daily Notes settings.
+- `starter-kit/.obsidian/templates.sample.json`
+  - Sample Templates settings.
+- `starter-kit/.obsidian/plugins/dataview/data.sample.json`
+  - Sample Dataview settings.
 - `starter-kit/.obsidian/snippets/task-dashboard.css`
-  - Dashboard styling that matches the note structure.
-- `starter-kit/sync-dashboard/`
-  - Local HTML + Node dashboard for direct markdown read/write outside Obsidian.
+  - CSS snippet for dashboard styling.
+- `starter-kit/sync-dashboard/index.html`
+  - HTML dashboard UI.
+- `starter-kit/sync-dashboard/server.js`
+  - Local Node server for HTML dashboard read/write.
 - `docs/DEVELOPMENT_WORKFLOW.md`
-  - Generic maintenance workflow for this package.
+  - Generic maintenance workflow.
 - `skills/obsidian-easytasks-dev/SKILL.md`
-  - Skill for developing the reusable package.
+  - Development skill for extending the package.
 - `skills/obsidian-easytasks-maintenance/SKILL.md`
-  - Skill for troubleshooting and upkeep.
+  - Maintenance skill for troubleshooting and upkeep.
 
-## Directory Layout
+## Directory Layout | 目录结构
 
 ```text
 EasyTasks/
@@ -33,115 +65,239 @@ EasyTasks/
 ├─ docs/
 │  └─ DEVELOPMENT_WORKFLOW.md
 ├─ skills/
-│  ├─ obsidian-easytasks-dev/SKILL.md
-│  └─ obsidian-easytasks-maintenance/SKILL.md
+│  ├─ obsidian-easytasks-dev/
+│  │  └─ SKILL.md
+│  └─ obsidian-easytasks-maintenance/
+│     └─ SKILL.md
 └─ starter-kit/
-   ├─ dashboard/Task Dashboard.md
-   ├─ Templates/Daily Note Template.md
-   ├─ DOC/fixed-tasks.json
    ├─ .obsidian/
    │  ├─ daily-notes.sample.json
    │  ├─ templates.sample.json
    │  ├─ plugins/dataview/data.sample.json
    │  └─ snippets/task-dashboard.css
-   └─ sync-dashboard/
-      ├─ index.html
-      └─ server.js
+   ├─ Daily Notes/
+   ├─ dashboard/Task Dashboard.md
+   ├─ DOC/fixed-tasks.json
+   ├─ sync-dashboard/
+   │  ├─ index.html
+   │  └─ server.js
+   └─ Templates/Daily Note Template.md
 ```
 
-## Core Design
+## Requirements | 环境要求
 
-### English
+### Required
 
-EasyTasks keeps the original system's useful invariants while removing vault-specific content:
+- Obsidian
+- Dataview plugin
+- Daily Notes core plugin
+- Templates core plugin
 
-- Daily notes are the source of truth.
-- Dashboard queries exclude `Templates/`.
-- Dataview task toggles still write back to source files.
-- Quick add can create missing daily notes from a template.
-- Fixed tasks are managed from one JSON file and synchronized into both the template and a target daily note.
-- The HTML dashboard is optional, but gives you a second control surface outside Obsidian.
+### Optional
 
-### 中文
+- Node.js 18+ for the HTML sync dashboard
 
-EasyTasks 保留了原系统最关键的行为约束，同时去掉了当前仓库专用的内容：
+### 必需项
 
-- 每日日报仍是任务数据的唯一真实来源。
-- 仪表盘统计默认排除 `Templates/`。
-- Dataview 中勾选任务仍会回写原始 markdown 文件。
-- 快速新建任务时，如果对应日报不存在，会自动按模板创建。
-- 固定任务统一由一个 JSON 文件管理，并可同步到日报模板和指定日报。
-- HTML 控制台是可选入口，用于在 Obsidian 外直接读写同一批 markdown 任务。
+- Obsidian
+- Dataview 插件
+- Daily Notes 核心插件
+- Templates 核心插件
 
-## Quick Start
+### 可选项
 
-### 1. Copy the Starter Kit into a Vault
+- Node.js 18+，用于运行 HTML 同步控制台
 
-Copy the contents of `EasyTasks/starter-kit/` into the root of an Obsidian vault. Keep these target paths unchanged if you want the package to work without edits:
+## Deployment Guide | 部署指南
 
-- `Daily Notes/`
+### Option A: Recommended Standard Layout | 方案 A：推荐标准布局
+
+This is the easiest setup. Copy everything under `starter-kit/` into the root of your vault and keep the directory names unchanged.
+
+这是最省事的部署方式。将 `starter-kit/` 下全部内容复制到 Vault 根目录，并保持目录名称不变。
+
+Target structure:
+
+```text
+YourVault/
+├─ .obsidian/
+├─ Daily Notes/
+├─ dashboard/
+│  └─ Task Dashboard.md
+├─ DOC/
+│  └─ fixed-tasks.json
+├─ sync-dashboard/
+│  ├─ index.html
+│  └─ server.js
+└─ Templates/
+   └─ Daily Note Template.md
+```
+
+### Option B: Custom Layout | 方案 B：自定义布局
+
+You can rename folders and files, but then you must update the hard-coded paths in:
+
+- `starter-kit/dashboard/Task Dashboard.md`
+- `starter-kit/sync-dashboard/server.js`
+- your Obsidian plugin settings
+
+你也可以改目录和文件名，但改名后必须同步修改以下位置中的路径：
+
+- `starter-kit/dashboard/Task Dashboard.md`
+- `starter-kit/sync-dashboard/server.js`
+- Obsidian 对应插件配置
+
+## Step-by-Step Setup | 逐步安装步骤
+
+### 1. Copy Files | 复制文件
+
+Copy the following from `starter-kit/` into your vault:
+
+- `dashboard/Task Dashboard.md`
 - `Templates/Daily Note Template.md`
 - `DOC/fixed-tasks.json`
 - `.obsidian/snippets/task-dashboard.css`
-- `dashboard/Task Dashboard.md`
 - `sync-dashboard/index.html`
 - `sync-dashboard/server.js`
 
-将 `EasyTasks/starter-kit/` 的内容复制到你的 Obsidian Vault 根目录。若希望零改动运行，建议保留下列路径名称：
+将 `starter-kit/` 中以下内容复制到你的 Vault：
 
-- `Daily Notes/`
+- `dashboard/Task Dashboard.md`
 - `Templates/Daily Note Template.md`
 - `DOC/fixed-tasks.json`
 - `.obsidian/snippets/task-dashboard.css`
-- `dashboard/Task Dashboard.md`
 - `sync-dashboard/index.html`
 - `sync-dashboard/server.js`
 
-### 2. Apply Obsidian Settings
+### 2. Configure Daily Notes | 配置 Daily Notes
 
-Use the sample JSON files as references:
+Reference:
 
 - `starter-kit/.obsidian/daily-notes.sample.json`
+
+Set:
+
+- folder: `Daily Notes`
+- format: `YYYY-MM-DD`
+- template: `Templates/Daily Note Template.md`
+
+参考：
+
+- `starter-kit/.obsidian/daily-notes.sample.json`
+
+建议设置：
+
+- folder: `Daily Notes`
+- format: `YYYY-MM-DD`
+- template: `Templates/Daily Note Template.md`
+
+### 3. Configure Templates | 配置 Templates
+
+Reference:
+
 - `starter-kit/.obsidian/templates.sample.json`
+
+Set the templates folder to:
+
+- `Templates`
+
+参考：
+
+- `starter-kit/.obsidian/templates.sample.json`
+
+将模板目录设置为：
+
+- `Templates`
+
+### 4. Configure Dataview | 配置 Dataview
+
+Reference:
+
 - `starter-kit/.obsidian/plugins/dataview/data.sample.json`
 
-Minimum plugin assumptions:
+Make sure:
 
-- Daily Notes enabled
-- Templates enabled
-- Dataview installed
-- DataviewJS enabled
+- Dataview is installed
+- DataviewJS is enabled
 
-使用 `starter-kit/.obsidian/` 下的 sample 配置作为参考，至少保证：
+参考：
 
-- 已启用 Daily Notes
-- 已启用 Templates
-- 已安装 Dataview
+- `starter-kit/.obsidian/plugins/dataview/data.sample.json`
+
+请确认：
+
+- Dataview 已安装
 - DataviewJS 已开启
 
-### 3. Enable the CSS Snippet
+### 5. Enable the CSS Snippet | 启用 CSS 片段
 
-Copy `starter-kit/.obsidian/snippets/task-dashboard.css` into your vault snippet directory, then enable the snippet in Obsidian Appearance settings.
+Enable `task-dashboard.css` in Obsidian Appearance settings.
 
-将 `starter-kit/.obsidian/snippets/task-dashboard.css` 放到你的 vault snippet 目录，并在 Obsidian 的外观设置中启用它。
+在 Obsidian 外观设置中启用 `task-dashboard.css`。
 
-### 4. Open the Dashboard Note
+### 6. Open the Dashboard Note | 打开仪表盘
 
-Open `dashboard/Task Dashboard.md`. You should see:
+Open:
 
-- Overview cards
-- Quick-add panel
-- Interactive open-task list
-- Due queue
+- `dashboard/Task Dashboard.md`
 
-打开 `dashboard/Task Dashboard.md` 后，你应能看到：
+Expected result:
 
-- 概览卡片
-- 快速新建面板
-- 可交互的未完成任务列表
-- 截止日期队列
+- overview cards render
+- quick-add panel renders
+- open task list is interactive
+- due queue renders
 
-### 5. Optional: Run the HTML Sync Dashboard
+打开：
+
+- `dashboard/Task Dashboard.md`
+
+预期结果：
+
+- 概览卡片正常显示
+- 快速新建面板正常显示
+- 未完成任务列表可交互
+- 截止日期队列正常显示
+
+## Reproducible Minimal Setup | 最小可复现部署
+
+If you want to reproduce the system from scratch in a clean vault, follow this exact sequence:
+
+如果你希望在一个全新的 Vault 中从零复现整套系统，可以严格按下面顺序操作：
+
+1. Create a new empty Obsidian vault.
+2. Enable `Daily Notes` and `Templates`.
+3. Install `Dataview`.
+4. Copy all files from `starter-kit/` into the new vault root.
+5. Apply the three sample JSON settings manually.
+6. Enable the CSS snippet.
+7. Open `dashboard/Task Dashboard.md`.
+8. Create or open today's daily note once.
+9. Add a task from the dashboard quick-add section.
+10. Confirm the new task appears in `Daily Notes/YYYY-MM-DD.md`.
+11. Toggle the task from the dashboard and confirm the checkbox writes back to the daily note.
+
+1. 新建一个空白 Obsidian Vault。
+2. 启用 `Daily Notes` 和 `Templates`。
+3. 安装 `Dataview`。
+4. 将 `starter-kit/` 全部文件复制到新 Vault 根目录。
+5. 手动套用 3 份 sample JSON 的关键配置。
+6. 启用 CSS snippet。
+7. 打开 `dashboard/Task Dashboard.md`。
+8. 先创建或打开一次当天日报。
+9. 在仪表盘的快速新建区域添加一个任务。
+10. 确认该任务已写入 `Daily Notes/YYYY-MM-DD.md`。
+11. 在仪表盘中勾选该任务，并确认状态已回写到日报源文件。
+
+## HTML Sync Dashboard | HTML 同步控制台
+
+### What It Does
+
+The HTML dashboard is a local companion UI. It reads and writes the same markdown files used by Obsidian.
+
+HTML 控制台是一个本地辅助入口，它直接读写与 Obsidian 相同的 markdown 文件。
+
+### How to Run
 
 From the vault root:
 
@@ -149,7 +305,9 @@ From the vault root:
 node sync-dashboard/server.js
 ```
 
-Then open [http://127.0.0.1:8765](http://127.0.0.1:8765).
+Then open:
+
+- [http://127.0.0.1:8765](http://127.0.0.1:8765)
 
 在 Vault 根目录运行：
 
@@ -157,11 +315,27 @@ Then open [http://127.0.0.1:8765](http://127.0.0.1:8765).
 node sync-dashboard/server.js
 ```
 
-然后访问 [http://127.0.0.1:8765](http://127.0.0.1:8765)。
+然后打开：
 
-## Task Format Contract
+- [http://127.0.0.1:8765](http://127.0.0.1:8765)
 
-EasyTasks expects plain markdown tasks and uses a few lightweight conventions:
+### What to Verify
+
+- the page loads
+- KPI cards render
+- quick add writes into a daily note
+- fixed tasks can be added and synced
+- checkbox toggles write back to markdown
+
+- 页面可正常打开
+- KPI 卡片正常渲染
+- 快速新建可写入日报
+- 固定任务可新增并同步
+- 勾选框可回写 markdown
+
+## Task Format Contract | 任务格式约定
+
+EasyTasks uses plain markdown task lines with lightweight markers:
 
 ```markdown
 - [ ] #project Ship the draft 🔺 due: 2026-03-15 -> 2026-03-13
@@ -175,7 +349,7 @@ Meaning:
 - `due: YYYY-MM-DD`: due date
 - `done: YYYY-MM-DD`: completion date
 - `#DAILYFIXED`: fixed-task marker
-- `[fixed_id::...]`: stable identifier for syncing fixed tasks
+- `[fixed_id::...]`: stable sync identifier for fixed tasks
 
 说明：
 
@@ -183,52 +357,130 @@ Meaning:
 - `due: YYYY-MM-DD`：截止日期
 - `done: YYYY-MM-DD`：完成日期
 - `#DAILYFIXED`：固定任务标记
-- `[fixed_id::...]`：固定任务同步所需的稳定 ID
+- `[fixed_id::...]`：固定任务同步使用的稳定标识
 
-## Fixed Task Workflow
-
-### English
+## Fixed Task Workflow | 固定任务工作流
 
 1. Edit `DOC/fixed-tasks.json`.
 2. Sync the template fixed-task block.
 3. Sync a target daily note when needed.
-4. Keep the block markers unchanged.
-
-### 中文
+4. Keep these markers unchanged:
+   - `<!-- DAILY_FIXED_TASKS:START -->`
+   - `<!-- DAILY_FIXED_TASKS:END -->`
 
 1. 编辑 `DOC/fixed-tasks.json`。
-2. 将固定任务同步回日报模板。
+2. 将固定任务同步到日报模板中的固定任务区块。
 3. 需要时再同步到指定日报。
-4. 不要改动固定任务块的起止注释标记。
+4. 保持以下标记不变：
+   - `<!-- DAILY_FIXED_TASKS:START -->`
+   - `<!-- DAILY_FIXED_TASKS:END -->`
 
-## Codex Skills
+## How the Dashboard Works | 仪表盘工作原理
 
-This package includes two local skills:
+### Obsidian Dashboard
 
-- `EasyTasks/skills/obsidian-easytasks-dev/SKILL.md`
-  - Use when extending or refactoring the reusable package.
-- `EasyTasks/skills/obsidian-easytasks-maintenance/SKILL.md`
-  - Use when fixing render issues, sync regressions, or documentation drift.
+- reads tasks from the vault with Dataview
+- excludes `Templates/` from metrics
+- writes back through Dataview task interactivity
+- inserts new tasks into the `### New Tasks` section
 
-本包附带两个本地 skill：
+### HTML Dashboard
 
-- `EasyTasks/skills/obsidian-easytasks-dev/SKILL.md`
-  - 适用于继续开发或重构通用包。
-- `EasyTasks/skills/obsidian-easytasks-maintenance/SKILL.md`
-  - 适用于排查渲染异常、同步回写故障或文档漂移。
+- scans markdown files directly
+- writes changed task lines back to disk
+- uses the same fixed-task source file
+- depends on the same heading conventions
 
-## Development Notes
+### Obsidian 仪表盘
 
-Use `docs/DEVELOPMENT_WORKFLOW.md` as the maintenance contract. When you change behavior, update README and the relevant skill file in the same turn.
+- 通过 Dataview 读取 Vault 中的任务
+- 统计时排除 `Templates/`
+- 依赖 Dataview 的任务交互能力回写源文件
+- 将新任务插入到 `### New Tasks` 区块
 
-以 `docs/DEVELOPMENT_WORKFLOW.md` 作为后续维护基线。只要行为发生变化，就应同时更新 README 和对应的 skill 文件。
+### HTML 控制台
 
-## Known Limits
+- 直接扫描 markdown 文件
+- 将修改后的任务行直接回写到磁盘
+- 使用相同的固定任务配置文件
+- 依赖相同的标题结构约定
 
-- The starter kit assumes a single vault-local Node process for the HTML dashboard.
+## Troubleshooting | 排错
+
+### Dashboard is blank | 仪表盘为空白
+
+Check:
+
+- Dataview is installed
+- DataviewJS is enabled
+- `Task Dashboard.md` paths still match your vault structure
+
+检查：
+
+- Dataview 是否已安装
+- DataviewJS 是否已开启
+- `Task Dashboard.md` 中的路径是否仍与当前 Vault 结构一致
+
+### New tasks are inserted in the wrong place | 新任务插入位置不对
+
+Check whether your daily note still contains:
+
+- `## Tasks`
+- `### New Tasks`
+
+检查日报中是否仍保留：
+
+- `## Tasks`
+- `### New Tasks`
+
+### Fixed tasks do not sync | 固定任务不同步
+
+Check:
+
+- `DOC/fixed-tasks.json` is valid JSON
+- the fixed-task markers still exist
+- template and daily note paths are unchanged or updated consistently
+
+检查：
+
+- `DOC/fixed-tasks.json` 是否为合法 JSON
+- 固定任务标记是否仍然存在
+- 模板与日报路径是否未改名，或已同步更新相关代码路径
+
+### HTML dashboard cannot write back | HTML 控制台无法回写
+
+Check:
+
+- Node.js version
+- server is started from the vault root
+- markdown files were not changed concurrently by another entry point
+
+检查：
+
+- Node.js 版本
+- 服务是否在 Vault 根目录启动
+- 同一任务是否被其他入口同时修改
+
+## Development and Maintenance | 开发与维护
+
+Use:
+
+- `docs/DEVELOPMENT_WORKFLOW.md`
+- `skills/obsidian-easytasks-dev/SKILL.md`
+- `skills/obsidian-easytasks-maintenance/SKILL.md`
+
+维护时建议配合使用：
+
+- `docs/DEVELOPMENT_WORKFLOW.md`
+- `skills/obsidian-easytasks-dev/SKILL.md`
+- `skills/obsidian-easytasks-maintenance/SKILL.md`
+
+## Known Limits | 已知限制
+
+- The HTML dashboard assumes a single local Node process.
 - Concurrent edits from multiple entry points can still conflict.
-- The dashboard note and HTML dashboard intentionally share simple heading contracts rather than a heavier task-id system.
+- Both dashboards currently rely on stable headings rather than a dedicated task-id system.
 
-- 当前 starter 假定 HTML 控制台由单个本地 Node 进程提供服务。
-- 多入口同时写同一任务仍可能发生冲突。
-- 仪表盘笔记与 HTML 控制台目前依赖稳定标题结构，而不是更重的 task-id 体系。
+- HTML 控制台默认假定由单个本地 Node 进程提供服务。
+- 多入口同时修改同一任务时仍可能产生冲突。
+- 当前两套入口都依赖稳定标题结构，而不是独立 task-id 体系。

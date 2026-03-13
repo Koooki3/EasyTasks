@@ -4,10 +4,13 @@
 <div class="module-subtitle">A compact operational view for daily execution, fixed routines, and due-date pressure.</div>
 
 ```dataviewjs
-const pages = dv.pages("").where((p) => !String(p.file.path).startsWith("Templates/"));
-const tasks = [];
-for (const page of pages) {
-  for (const task of (page.file?.tasks ?? [])) tasks.push(task);
+const DASHBOARD_PATH = String(dv.current().file.path ?? "");
+const PACKAGE_ROOT = DASHBOARD_PATH.includes("/dashboard/") ? DASHBOARD_PATH.split("/dashboard/")[0] : "";
+const SCOPE_PREFIX = PACKAGE_ROOT ? `${PACKAGE_ROOT}/` : "";
+
+function inScope(path) {
+  const value = String(path ?? "");
+  return value.startsWith(SCOPE_PREFIX) && !value.startsWith(`${SCOPE_PREFIX}Templates/`);
 }
 
 function textOf(task) {
@@ -22,9 +25,15 @@ function dateKey(value) {
   return window.moment(raw).isValid() ? window.moment(raw).format("YYYY-MM-DD") : raw.slice(0, 10);
 }
 
+const pages = dv.pages("").where((p) => inScope(p.file.path));
+const tasks = [];
+for (const page of pages) {
+  for (const task of (page.file?.tasks ?? [])) tasks.push(task);
+}
+
 const today = window.moment().format("YYYY-MM-DD");
-const open = tasks.filter((task) => !task.completed);
-const done = tasks.filter((task) => task.completed);
+const open = tasks.filter((task) => !task.completed && String(task?.status ?? " ") !== "-");
+const done = tasks.filter((task) => task.completed && String(task?.status ?? " ") !== "-");
 const fixedOpen = open.filter((task) => textOf(task).includes("#DAILYFIXED"));
 const createdToday = tasks.filter((task) => dateKey(task.created) === today && !textOf(task).includes("#DAILYFIXED")).length;
 const doneToday = done.filter((task) => dateKey(task.completion) === today).length;
@@ -54,8 +63,11 @@ const chips = dv.container.createDiv({ cls: "dashboard-chip-wrap" });
 <div class="module-subtitle">Create a task in a daily note. Missing daily files are created from the template automatically.</div>
 
 ```dataviewjs
-const DAILY_FOLDER = "Daily Notes";
-const TEMPLATE_PATH = "Templates/Daily Note Template.md";
+const DASHBOARD_PATH = String(dv.current().file.path ?? "");
+const PACKAGE_ROOT = DASHBOARD_PATH.includes("/dashboard/") ? DASHBOARD_PATH.split("/dashboard/")[0] : "";
+const ROOT_PREFIX = PACKAGE_ROOT ? `${PACKAGE_ROOT}/` : "";
+const DAILY_FOLDER = `${ROOT_PREFIX}Daily Notes`;
+const TEMPLATE_PATH = `${ROOT_PREFIX}Templates/Daily Note Template.md`;
 const TODO_HEADING_RE = /^##\s*(Tasks|To Do)\s*$/i;
 const NEW_TASK_HEADING_RE = /^###\s*(New Tasks|Inbox)\s*$/i;
 const H2_HEADING_RE = /^##\s+/;
@@ -68,7 +80,7 @@ const panel = root.createDiv({ cls: "task-dashboard-create" });
 panel.createEl("h3", { text: "Add task to daily note" });
 panel.createEl("p", {
   cls: "task-dashboard-hint",
-  text: "Tasks are inserted under the 'New Tasks' section. Use the HTML sync dashboard for fixed-task administration."
+  text: "Tasks are inserted under the 'New Tasks' section. Missing daily notes are created in the package scope."
 });
 
 const titleRow = panel.createDiv({ cls: "task-dashboard-row" });
@@ -102,9 +114,9 @@ const prioritySelect = priorityGroup.createEl("select");
 prioritySelect.className = "task-dashboard-input";
 [
   { label: "None", value: "" },
-  { label: "High 🔺", value: "🔺" },
-  { label: "Medium 🔶", value: "🔶" },
-  { label: "Low 🔹", value: "🔹" }
+  { label: "High 🔽", value: "🔽" },
+  { label: "Medium 🔼", value: "🔼" },
+  { label: "Low 🔺", value: "🔺" }
 ].forEach((item) => {
   const option = prioritySelect.createEl("option");
   option.value = item.value;
@@ -210,32 +222,145 @@ openButton.onclick = async () => {
 ```
 
 ## Open Tasks
-<div class="module-subtitle">Dataview checkboxes remain interactive and write back to the source file.</div>
+<div class="module-subtitle">Dataview checkboxes remain interactive and write back to the source file. Cancelled tasks are excluded.</div>
 
-```dataview
-TASK
-FROM ""
-WHERE !completed
-AND !contains(file.path, "Templates/")
-SORT contains(text, "#DAILYFIXED") DESC, due ASC, file.name ASC
+```dataviewjs
+const DASHBOARD_PATH = String(dv.current().file.path ?? "");
+const PACKAGE_ROOT = DASHBOARD_PATH.includes("/dashboard/") ? DASHBOARD_PATH.split("/dashboard/")[0] : "";
+const SCOPE_PREFIX = PACKAGE_ROOT ? `${PACKAGE_ROOT}/` : "";
+const pages = dv.pages("").where((p) => String(p.file.path ?? "").startsWith(SCOPE_PREFIX) && !String(p.file.path ?? "").startsWith(`${SCOPE_PREFIX}Templates/`));
+const rows = [];
+for (const page of pages) {
+  for (const task of (page.file?.tasks ?? [])) {
+    if (!task.completed && String(task?.status ?? " ") !== "-") rows.push(task);
+  }
+}
+dv.taskList(rows, false);
 ```
 
 ## Due Queue
-<div class="module-subtitle">Use due dates for near-term pressure. Keep the task text parseable and stable.</div>
+<div class="module-subtitle">Use due dates for near-term pressure. Cancelled tasks are excluded.</div>
 
-```dataview
-TASK
-FROM ""
-WHERE !completed
-AND due
-AND !contains(file.path, "Templates/")
-SORT due ASC, file.name ASC
+```dataviewjs
+const DASHBOARD_PATH = String(dv.current().file.path ?? "");
+const PACKAGE_ROOT = DASHBOARD_PATH.includes("/dashboard/") ? DASHBOARD_PATH.split("/dashboard/")[0] : "";
+const SCOPE_PREFIX = PACKAGE_ROOT ? `${PACKAGE_ROOT}/` : "";
+const pages = dv.pages("").where((p) => String(p.file.path ?? "").startsWith(SCOPE_PREFIX) && !String(p.file.path ?? "").startsWith(`${SCOPE_PREFIX}Templates/`));
+const rows = [];
+for (const page of pages) {
+  for (const task of (page.file?.tasks ?? [])) {
+    if (!task.completed && String(task?.status ?? " ") !== "-" && task.due) rows.push(task);
+  }
+}
+rows.sort((a, b) => String(a.due ?? "").localeCompare(String(b.due ?? "")) || String(a.text ?? "").localeCompare(String(b.text ?? "")));
+dv.taskList(rows, false);
+```
+
+## Recent Activity
+<div class="module-subtitle">Shows up to 20 recent created, completed, and cancelled task events within the package scope.</div>
+
+```dataviewjs
+const DASHBOARD_PATH = String(dv.current().file.path ?? "");
+const PACKAGE_ROOT = DASHBOARD_PATH.includes("/dashboard/") ? DASHBOARD_PATH.split("/dashboard/")[0] : "";
+const SCOPE_PREFIX = PACKAGE_ROOT ? `${PACKAGE_ROOT}/` : "";
+const pages = dv.pages("").where((p) => String(p.file.path ?? "").startsWith(SCOPE_PREFIX) && !String(p.file.path ?? "").startsWith(`${SCOPE_PREFIX}Templates/`));
+const tasks = [];
+for (const page of pages) {
+  for (const task of (page.file?.tasks ?? [])) tasks.push(task);
+}
+
+function dateKey(value) {
+  if (!value) return "";
+  if (typeof value === "string") return window.moment(value).isValid() ? window.moment(value).format("YYYY-MM-DD") : String(value).slice(0, 10);
+  if (typeof value.toISODate === "function") return value.toISODate();
+  const raw = String(value);
+  return window.moment(raw).isValid() ? window.moment(raw).format("YYYY-MM-DD") : raw.slice(0, 10);
+}
+
+function markerDate(text, marker) {
+  const escaped = marker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = String(text).match(new RegExp(`${escaped}\\s*(\\d{4}-\\d{2}-\\d{2})`));
+  return match ? match[1] : "";
+}
+
+const activity = [];
+for (const task of tasks) {
+  const text = String(task?.text ?? task?.visual ?? "");
+  const created = dateKey(task.created);
+  const completion = dateKey(task.completion);
+  const cancelled = markerDate(text, "❌");
+  if (created) activity.push({ label: "Created", tone: "created", date: created, task });
+  if (completion) activity.push({ label: "Completed", tone: "completed", date: completion, task });
+  if (String(task?.status ?? " ") === "-" || cancelled) {
+    activity.push({ label: "Cancelled", tone: "cancelled", date: cancelled || created, task });
+  }
+}
+
+const styleId = "easytasks-activity-style-v1";
+let style = document.getElementById(styleId);
+if (!style) {
+  style = document.createElement("style");
+  style.id = styleId;
+  document.head.appendChild(style);
+}
+style.textContent = `
+  .et-activity-board{display:grid;gap:8px}
+  .et-activity-row{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:start;padding:8px 10px;border:1px solid var(--background-modifier-border);border-radius:10px;background:var(--background-secondary)}
+  .et-activity-badge{min-width:64px;padding:2px 8px;border-radius:999px;font-size:.78em;font-weight:700;text-align:center}
+  .et-activity-badge.created{background:color-mix(in srgb,#2563eb 14%,var(--background-primary));color:#2563eb}
+  .et-activity-badge.completed{background:color-mix(in srgb,#16a34a 14%,var(--background-primary));color:#15803d}
+  .et-activity-badge.cancelled{background:color-mix(in srgb,#dc2626 14%,var(--background-primary));color:#b91c1c}
+  .et-activity-text.cancelled{text-decoration:line-through;color:var(--text-muted)}
+  .et-activity-meta{font-size:.8em;color:var(--text-muted)}
+`;
+
+const rows = activity
+  .filter((item) => item.date)
+  .sort((a, b) => b.date.localeCompare(a.date))
+  .slice(0, 20);
+
+if (!rows.length) {
+  dv.el("div", "No recent task activity.", { cls: "task-dashboard-hint" });
+} else {
+  const board = dv.container.createDiv({ cls: "et-activity-board" });
+  rows.forEach((row) => {
+    const item = board.createDiv({ cls: "et-activity-row" });
+    item.createEl("span", { cls: `et-activity-badge ${row.tone}`.trim(), text: row.label });
+    item.createEl("div", {
+      cls: `et-activity-text ${row.tone === "cancelled" ? "cancelled" : ""}`.trim(),
+      text: String(row.task?.text ?? row.task?.visual ?? "")
+    });
+    item.createEl("div", { cls: "et-activity-meta", text: row.date });
+  });
+}
+```
+
+## Completed Tasks
+<div class="module-subtitle">Shows up to 10 recently completed tasks in the package scope.</div>
+
+```dataviewjs
+const DASHBOARD_PATH = String(dv.current().file.path ?? "");
+const PACKAGE_ROOT = DASHBOARD_PATH.includes("/dashboard/") ? DASHBOARD_PATH.split("/dashboard/")[0] : "";
+const SCOPE_PREFIX = PACKAGE_ROOT ? `${PACKAGE_ROOT}/` : "";
+const pages = dv.pages("").where((p) => String(p.file.path ?? "").startsWith(SCOPE_PREFIX) && !String(p.file.path ?? "").startsWith(`${SCOPE_PREFIX}Templates/`));
+const rows = [];
+for (const page of pages) {
+  for (const task of (page.file?.tasks ?? [])) {
+    if (task.completed && String(task?.status ?? " ") !== "-") rows.push(task);
+  }
+}
+rows.sort((a, b) => String(b.completion ?? "").localeCompare(String(a.completion ?? "")));
+dv.taskList(rows.slice(0, 10), false);
 ```
 
 ## Fixed Task Signal
 
-```dataview
-TABLE length(filter(file.tasks, (t) => !t.completed and contains(t.text, "#DAILYFIXED"))) AS "Open Fixed Tasks"
-FROM "Daily Notes"
-WHERE file.name = date(today)
+```dataviewjs
+const DASHBOARD_PATH = String(dv.current().file.path ?? "");
+const PACKAGE_ROOT = DASHBOARD_PATH.includes("/dashboard/") ? DASHBOARD_PATH.split("/dashboard/")[0] : "";
+const DAILY_SCOPE = PACKAGE_ROOT ? `${PACKAGE_ROOT}/Daily Notes` : "Daily Notes";
+const today = window.moment().format("YYYY-MM-DD");
+const page = dv.page(`${DAILY_SCOPE}/${today}`);
+const openFixed = (page?.file?.tasks ?? []).filter((task) => !task.completed && String(task?.status ?? " ") !== "-" && String(task?.text ?? "").includes("#DAILYFIXED")).length;
+dv.table(["Open Fixed Tasks"], [[openFixed]]);
 ```

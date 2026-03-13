@@ -50,6 +50,8 @@ EasyTasks 适合希望在 Obsidian 内构建可用任务系统、但不想从零
   - HTML dashboard UI.
 - `starter-kit/sync-dashboard/server.js`
   - Local Node server for HTML dashboard read/write.
+- `starter-kit/dashboard/Task Dashboard.md`
+  - The dashboard now derives its package root from its own file path, so when the starter is kept inside a larger parent vault for development, metrics stay isolated to the package scope instead of leaking parent-vault data.
 - `docs/DEVELOPMENT_WORKFLOW.md`
   - Generic maintenance workflow.
 - `skills/obsidian-easytasks-dev/SKILL.md`

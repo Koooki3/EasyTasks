@@ -11,7 +11,8 @@ This workflow is for maintaining the generic EasyTasks package without re-coupli
 2. Preserve bidirectional behavior.
    - Task toggles in Dataview and in `sync-dashboard` must write back to source markdown.
 3. Exclude templates from metrics.
-   - Use `!String(path).startsWith("Templates/")` in DataviewJS and `!contains(file.path, "Templates/")` in DQL.
+  - Use `!String(path).startsWith("Templates/")` in DataviewJS and `!contains(file.path, "Templates/")` in DQL.
+  - If the starter dashboard is opened inside a larger parent vault instead of a copied standalone vault, scope queries to the package root derived from the dashboard file path before applying template exclusion.
 4. Keep heading contracts stable.
    - Daily notes should keep `## Tasks`, `### New Tasks`, `## Notes`.
    - Fixed-task block markers must remain:

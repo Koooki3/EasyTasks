@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>EasyTasks Sync Dashboard</title>
+  <style>
+    :root {
+      --bg: #eef2f7;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #d8e0ea;
+      --accent: #0f766e;
+      --danger: #dc2626;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: radial-gradient(circle at 10% 0%, #dde7f3 0, transparent 42%), var(--bg);
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .wrap { max-width: 1180px; margin: 24px auto 48px; padding: 0 14px; }
+    h1 { margin: 0; font-size: 1.65rem; }
+    .meta { color: var(--muted); margin: 6px 0 18px; }
+    .grid { display: grid; gap: 12px; }
+    .cards { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+    .card, .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+    }
+    .card { padding: 12px; }
+    .k { color: var(--muted); font-size: 0.82rem; }
+    .v { margin-top: 4px; font-size: 1.5rem; font-weight: 700; }
+    .cols, .split { grid-template-columns: 1fr; }
+    @media (min-width: 980px) {
+      .cols { grid-template-columns: 1fr 1fr; }
+      .split { grid-template-columns: 1fr 1fr; }
+    }
+    .panel { padding: 14px; }
+    h2 { margin: 0 0 10px; font-size: 1.02rem; }
+    .row { display: grid; gap: 8px; margin-bottom: 10px; }
+    .row.two { grid-template-columns: 1fr 1fr; }
+    .row.three { grid-template-columns: 1fr 1fr 1fr; }
+    input, select, button {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.94rem;
+      background: #fff;
+    }
+    button {
+      cursor: pointer;
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      font-weight: 600;
+    }
+    button.secondary {
+      background: #fff;
+      color: var(--text);
+      border-color: var(--line);
+    }
+    button.danger {
+      background: #fff;
+      color: var(--danger);
+      border-color: color-mix(in srgb, var(--danger) 45%, var(--line));
+    }
+    .toolbar { display: flex; gap: 8px; }
+    .msg { min-height: 18px; color: var(--muted); font-size: 0.86rem; }
+    .msg.error { color: var(--danger); }
+    .task-list { max-height: 420px; overflow: auto; border-top: 1px dashed var(--line); margin-top: 10px; padding-top: 10px; }
+    .task {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: start;
+      border-bottom: 1px dashed #edf2f7;
+      padding: 8px 0;
+      font-size: 0.92rem;
+    }
+    .task small { color: var(--muted); }
+    .mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.82rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>EasyTasks Sync Dashboard</h1>
+    <div class="meta" id="meta">Loading workspace state...</div>
+
+    <section class="grid cards" id="kpis"></section>
+
+    <section class="grid cols" style="margin-top: 12px;">
+      <div class="panel">
+        <h2>Quick Add</h2>
+        <div class="row"><input id="title" placeholder="Task title"></div>
+        <div class="row three">
+          <input id="date" type="date">
+          <input id="due" type="date">
+          <select id="priority">
+            <option value="">Priority (optional)</option>
+            <option value="🔺">High 🔺</option>
+            <option value="🔶">Medium 🔶</option>
+            <option value="🔹">Low 🔹</option>
+          </select>
+        </div>
+        <div class="row"><input id="tags" placeholder="Tags separated by spaces"></div>
+        <div class="toolbar">
+          <button id="add-btn">Add Task</button>
+          <button class="secondary" id="sync-daily-btn">Sync Fixed Tasks to Selected Day</button>
+        </div>
+        <div class="msg" id="add-msg"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Fixed Tasks</h2>
+        <div class="row two">
+          <input id="fixed-title" placeholder="Fixed task title">
+          <button id="fixed-add-btn">Add Fixed Task</button>
+        </div>
+        <div class="toolbar">
+          <button class="secondary" id="sync-template-btn">Sync Fixed Tasks to Template</button>
+        </div>
+        <div class="msg" id="fixed-msg"></div>
+        <div class="task-list" id="fixed-list"></div>
+      </div>
+    </section>
+
+    <section class="grid split" style="margin-top: 12px;">
+      <div class="panel">
+        <h2>Open Tasks</h2>
+        <div class="task-list" id="open-list"></div>
+      </div>
+      <div class="panel">
+        <h2>Due Queue</h2>
+        <div class="task-list" id="ddl-list"></div>
+      </div>
+    </section>
+
+    <section class="grid split" style="margin-top: 12px;">
+      <div class="panel">
+        <h2>Recently Completed</h2>
+        <div class="task-list" id="done-list"></div>
+      </div>
+      <div class="panel">
+        <h2>How It Writes</h2>
+        <p>1. This page reads and writes the markdown files in the starter vault directly.</p>
+        <p>2. Toggling a checkbox writes back to the original task line.</p>
+        <p>3. Fixed tasks are sourced from <span class="mono">DOC/fixed-tasks.json</span>.</p>
+        <p>4. Use one editing entry point at a time to reduce write conflicts.</p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const today = new Date().toISOString().slice(0, 10);
+    $("date").value = today;
+
+    async function api(url, method = "GET", body) {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const data = await res.json();
+      if (!res.ok || data.ok === false) throw new Error(data.error || `HTTP ${res.status}`);
+      return data;
+    }
+
+    function setMessage(id, text, isError = false) {
+      const el = $(id);
+      el.textContent = text || "";
+      el.classList.toggle("error", isError);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function renderKpis(metrics) {
+      const items = [
+        ["Open", metrics.open],
+        ["Fixed Open", metrics.fixedOpen],
+        ["Created Today", metrics.createdToday],
+        ["Done Today", metrics.doneToday],
+        ["Due", metrics.dueOpen],
+        ["Overdue", metrics.overdue],
+      ];
+      $("kpis").innerHTML = "";
+      for (const [label, value] of items) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `<div class="k">${label}</div><div class="v">${value}</div>`;
+        $("kpis").appendChild(card);
+      }
+    }
+
+    function taskNode(task, readOnly = false) {
+      const row = document.createElement("div");
+      row.className = "task";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = !!task.checked;
+      checkbox.disabled = readOnly;
+      checkbox.onchange = async () => {
+        try {
+          await api("/api/task/toggle", "POST", {
+            path: task.path,
+            lineNo: task.lineNo,
+            line: task.line,
+            checked: checkbox.checked,
+          });
+          await refresh();
+        } catch (error) {
+          checkbox.checked = !checkbox.checked;
+          setMessage("meta", `Write-back failed: ${error.message}`, true);
+        }
+      };
+
+      const body = document.createElement("div");
+      body.innerHTML = `<div>${escapeHtml(task.text)}</div><small>${task.path}:${task.lineNo}</small>`;
+
+      const meta = document.createElement("div");
+      meta.className = "mono";
+      meta.textContent = [
+        task.created && `+${task.created}`,
+        task.due && `due ${task.due}`,
+        task.isFixed ? "fixed" : "",
+      ].filter(Boolean).join(" | ");
+
+      row.append(checkbox, body, meta);
+      return row;
+    }
+
+    function drawTaskList(id, tasks, readOnly = false) {
+      const el = $(id);
+      el.innerHTML = "";
+      if (!tasks.length) {
+        el.innerHTML = '<div class="msg">No tasks found.</div>';
+        return;
+      }
+      tasks.forEach((task) => el.appendChild(taskNode(task, readOnly)));
+    }
+
+    async function drawFixedTasks() {
+      const data = await api("/api/fixed/list");
+      const el = $("fixed-list");
+      el.innerHTML = "";
+      if (!data.tasks.length) {
+        el.innerHTML = '<div class="msg">No fixed tasks yet.</div>';
+        return;
+      }
+      for (const task of data.tasks) {
+        const row = document.createElement("div");
+        row.className = "task";
+        row.innerHTML = `
+          <div></div>
+          <div>
+            <div>${escapeHtml(task.title)}</div>
+            <small>${escapeHtml(task.id)}</small>
+          </div>
+          <div><button class="danger">Delete</button></div>
+        `;
+        row.querySelector("button").onclick = async () => {
+          try {
+            await api("/api/fixed/delete", "POST", { id: task.id });
+            setMessage("fixed-msg", `Removed fixed task: ${task.title}`);
+            await refresh();
+          } catch (error) {
+            setMessage("fixed-msg", error.message, true);
+          }
+        };
+        el.appendChild(row);
+      }
+    }
+
+    async function refresh() {
+      const data = await api("/api/dashboard");
+      $("meta").textContent = `Vault root: ${data.root} | Today: ${data.today}`;
+      renderKpis(data.metrics);
+      drawTaskList("open-list", data.open);
+      drawTaskList("ddl-list", data.ddl);
+      drawTaskList("done-list", data.done, true);
+      await drawFixedTasks();
+    }
+
+    $("add-btn").onclick = async () => {
+      try {
+        const result = await api("/api/task/add", "POST", {
+          title: $("title").value,
+          date: $("date").value,
+          due: $("due").value,
+          priority: $("priority").value,
+          tags: $("tags").value,
+        });
+        $("title").value = "";
+        $("due").value = "";
+        $("tags").value = "";
+        $("priority").value = "";
+        setMessage("add-msg", `Task written to ${result.path}`);
+        await refresh();
+      } catch (error) {
+        setMessage("add-msg", error.message, true);
+      }
+    };
+
+    $("fixed-add-btn").onclick = async () => {
+      try {
+        await api("/api/fixed/add", "POST", { title: $("fixed-title").value });
+        $("fixed-title").value = "";
+        setMessage("fixed-msg", "Fixed task added and template synced.");
+        await refresh();
+      } catch (error) {
+        setMessage("fixed-msg", error.message, true);
+      }
+    };
+
+    $("sync-template-btn").onclick = async () => {
+      try {
+        await api("/api/fixed/sync-template", "POST", {});
+        setMessage("fixed-msg", "Template fixed-task block synced.");
+      } catch (error) {
+        setMessage("fixed-msg", error.message, true);
+      }
+    };
+
+    $("sync-daily-btn").onclick = async () => {
+      try {
+        const result = await api("/api/fixed/sync-daily", "POST", { date: $("date").value });
+        setMessage("add-msg", `Fixed tasks synced to ${result.path}`);
+        await refresh();
+      } catch (error) {
+        setMessage("add-msg", error.message, true);
+      }
+    };
+
+    refresh().catch((error) => {
+      $("meta").textContent = `Failed to load dashboard: ${error.message}`;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "tasks": [
+    {
+      "id": "exercise",
+      "title": "Move your body for 20 minutes",
+      "created": "2026-03-13"
+    },
+    {
+      "id": "review",
+      "title": "Review today's top priorities",
+      "created": "2026-03-13"
+    },
+    {
+      "id": "shutdown",
+      "title": "Write a short end-of-day note",
+      "created": "2026-03-13"
+    }
+  ]
+}

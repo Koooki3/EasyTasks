@@ -283,12 +283,13 @@ function markerDate(text, marker) {
   return match ? match[1] : "";
 }
 
+const CANCEL_MARK = "cancel:";
 const activity = [];
 for (const task of tasks) {
   const text = String(task?.text ?? task?.visual ?? "");
   const created = dateKey(task.created);
   const completion = dateKey(task.completion);
-  const cancelled = markerDate(text, "❌");
+  const cancelled = markerDate(text, CANCEL_MARK);
   if (created) activity.push({ label: "Created", tone: "created", date: created, task });
   if (completion) activity.push({ label: "Completed", tone: "completed", date: completion, task });
   if (String(task?.status ?? " ") === "-" || cancelled) {

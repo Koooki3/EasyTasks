@@ -22,6 +22,8 @@ EasyTasks 适合希望在 Obsidian 内构建可用任务系统、但不想从零
 - Missing daily notes can be created automatically from the template.
 - Fixed tasks are managed from one JSON file and synced into both template and daily notes.
 - An optional local HTML dashboard can read and write the same markdown task files.
+- Cancelled tasks can be represented explicitly and excluded from active queues.
+- The packaged dashboard can stay scoped to its own folder tree when developed inside a larger vault.
 
 - 每日日报仍是任务数据的唯一真实来源。
 - 仪表盘默认排除模板目录中的任务，避免统计污染。
@@ -29,11 +31,13 @@ EasyTasks 适合希望在 Obsidian 内构建可用任务系统、但不想从零
 - 如果目标日报不存在，可以按模板自动创建。
 - 固定任务统一由一个 JSON 文件管理，并同步到模板和指定日报。
 - 可选的本地 HTML 控制台可直接读写同一批 markdown 任务文件。
+- 可显式表示取消任务，并将其排除在活跃队列之外。
+- 当该 starter 作为子目录在更大的 Vault 中开发时，仪表盘可保持对自身目录树的作用域隔离。
 
 ## Package Contents | 包含内容
 
 - `starter-kit/dashboard/Task Dashboard.md`
-  - Main dashboard note for Obsidian.
+  - Main dashboard note for Obsidian, scoped to the package and including recent activity plus cancelled-task exclusion.
 - `starter-kit/Templates/Daily Note Template.md`
   - Daily note template used by the quick-add flow.
 - `starter-kit/DOC/fixed-tasks.json`
@@ -50,8 +54,6 @@ EasyTasks 适合希望在 Obsidian 内构建可用任务系统、但不想从零
   - HTML dashboard UI.
 - `starter-kit/sync-dashboard/server.js`
   - Local Node server for HTML dashboard read/write.
-- `starter-kit/dashboard/Task Dashboard.md`
-  - The dashboard now derives its package root from its own file path, so when the starter is kept inside a larger parent vault for development, metrics stay isolated to the package scope instead of leaking parent-vault data.
 - `docs/DEVELOPMENT_WORKFLOW.md`
   - Generic maintenance workflow.
 - `skills/obsidian-easytasks-dev/SKILL.md`
@@ -278,6 +280,7 @@ If you want to reproduce the system from scratch in a clean vault, follow this e
 9. Add a task from the dashboard quick-add section.
 10. Confirm the new task appears in `Daily Notes/YYYY-MM-DD.md`.
 11. Toggle the task from the dashboard and confirm the checkbox writes back to the daily note.
+12. Optionally create a cancelled task with `- [-]` and verify it does not appear in open queues.
 
 1. 新建一个空白 Obsidian Vault。
 2. 启用 `Daily Notes` 和 `Templates`。
@@ -350,6 +353,7 @@ Meaning:
 - `-> YYYY-MM-DD`: created date
 - `due: YYYY-MM-DD`: due date
 - `done: YYYY-MM-DD`: completion date
+- `cancel: YYYY-MM-DD`: cancel date
 - `#DAILYFIXED`: fixed-task marker
 - `[fixed_id::...]`: stable sync identifier for fixed tasks
 
@@ -358,8 +362,21 @@ Meaning:
 - `-> YYYY-MM-DD`：创建日期
 - `due: YYYY-MM-DD`：截止日期
 - `done: YYYY-MM-DD`：完成日期
+- `cancel: YYYY-MM-DD`：取消日期
 - `#DAILYFIXED`：固定任务标记
 - `[fixed_id::...]`：固定任务同步使用的稳定标识
+
+Cancelled task example:
+
+```markdown
+- [-] Drop outdated draft cancel: 2026-03-23 -> 2026-03-20
+```
+
+取消任务示例：
+
+```markdown
+- [-] Drop outdated draft cancel: 2026-03-23 -> 2026-03-20
+```
 
 ## Fixed Task Workflow | 固定任务工作流
 
@@ -397,6 +414,7 @@ Meaning:
 
 - 通过 Dataview 读取 Vault 中的任务
 - 统计时排除 `Templates/`
+- 当 starter 作为子目录存在时，自动限制在当前 package 作用域内统计
 - 依赖 Dataview 的任务交互能力回写源文件
 - 将新任务插入到 `### New Tasks` 区块
 

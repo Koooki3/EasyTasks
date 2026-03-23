@@ -147,11 +147,25 @@
         <div class="task-list" id="done-list"></div>
       </div>
       <div class="panel">
+        <h2>Recent Activity</h2>
+        <div class="task-list" id="activity-list"></div>
+      </div>
+    </section>
+
+    <section class="grid split" style="margin-top: 12px;">
+      <div class="panel">
         <h2>How It Writes</h2>
         <p>1. This page reads and writes the markdown files in the starter vault directly.</p>
         <p>2. Toggling a checkbox writes back to the original task line.</p>
         <p>3. Fixed tasks are sourced from <span class="mono">DOC/fixed-tasks.json</span>.</p>
         <p>4. Use one editing entry point at a time to reduce write conflicts.</p>
+      </div>
+      <div class="panel">
+        <h2>Status Notes</h2>
+        <p>1. Open tasks use <span class="mono">- [ ]</span>.</p>
+        <p>2. Completed tasks use <span class="mono">- [x]</span> with <span class="mono">done: YYYY-MM-DD</span>.</p>
+        <p>3. Cancelled tasks can use <span class="mono">- [-]</span> and optionally <span class="mono">cancel: YYYY-MM-DD</span>.</p>
+        <p>4. Cancelled tasks are excluded from open and completed queues.</p>
       </div>
     </section>
   </div>
@@ -251,6 +265,29 @@
       tasks.forEach((task) => el.appendChild(taskNode(task, readOnly)));
     }
 
+    function drawActivity(items) {
+      const el = $("activity-list");
+      el.innerHTML = "";
+      if (!items.length) {
+        el.innerHTML = '<div class="msg">No recent activity.</div>';
+        return;
+      }
+      for (const item of items) {
+        const row = document.createElement("div");
+        row.className = "task";
+        const label = item.type === "completed" ? "Completed" : item.type === "cancelled" ? "Cancelled" : "Created";
+        row.innerHTML = `
+          <div class="mono">${label}</div>
+          <div>
+            <div>${escapeHtml(item.task.text)}</div>
+            <small>${escapeHtml(item.task.path)}:${item.task.lineNo}</small>
+          </div>
+          <div class="mono">${escapeHtml(item.date || "")}</div>
+        `;
+        el.appendChild(row);
+      }
+    }
+
     async function drawFixedTasks() {
       const data = await api("/api/fixed/list");
       const el = $("fixed-list");
@@ -290,6 +327,7 @@
       drawTaskList("open-list", data.open);
       drawTaskList("ddl-list", data.ddl);
       drawTaskList("done-list", data.done, true);
+      drawActivity(data.activity || []);
       await drawFixedTasks();
     }
 

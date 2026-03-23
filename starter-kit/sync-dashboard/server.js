@@ -14,10 +14,11 @@ const NEW_TASK_HEADING_RE = /^###\s*(New Tasks|Inbox)\s*$/i;
 const H2_HEADING_RE = /^##\s+/;
 const FIXED_BLOCK_START = "<!-- DAILY_FIXED_TASKS:START -->";
 const FIXED_BLOCK_END = "<!-- DAILY_FIXED_TASKS:END -->";
-const TASK_LINE_RE = /^(\s*)- \[( |x)\] (.*)$/;
+const TASK_LINE_RE = /^(\s*)- \[( |x|-)\] (.*)$/;
 const CREATED_MARK = "->";
 const DUE_MARK = "due:";
 const DONE_MARK = "done:";
+const CANCEL_MARK = "cancel:";
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
@@ -80,11 +81,14 @@ function parseTaskLine(line, absPath, lineNo) {
     absPath,
     lineNo,
     line,
+    status: match[2],
     checked: match[2] === "x",
+    isCancelled: match[2] === "-",
     text: body,
     created: extractDate(body, CREATED_MARK),
     due: extractDate(body, DUE_MARK),
     completion: extractDate(body, DONE_MARK),
+    cancelled: extractDate(body, CANCEL_MARK),
     fixedId: (body.match(/\[fixed_id::([^\]]+)\]/) || [])[1] || "",
     isFixed: body.includes("#DAILYFIXED"),
     dailyDate: dateFromPath(absPath),
@@ -131,8 +135,8 @@ function priorityScore(task) {
 
 function buildMetrics(tasks) {
   const today = todayStr();
-  const open = tasks.filter((task) => !task.checked);
-  const done = tasks.filter((task) => task.checked);
+  const open = tasks.filter((task) => !task.checked && !task.isCancelled);
+  const done = tasks.filter((task) => task.checked && !task.isCancelled);
   const fixedOpen = open.filter((task) => task.isFixed);
   const normalOpen = open.filter((task) => !task.isFixed);
   const dueOpen = open.filter((task) => task.due);
@@ -150,6 +154,25 @@ function buildMetrics(tasks) {
     dueOpen: dueOpen.length,
     overdue: overdue.length,
   };
+}
+
+function buildActivity(tasks) {
+  const rows = [];
+  for (const task of tasks) {
+    if (task.created) rows.push({ type: "created", date: task.created, task });
+    if (task.completion) rows.push({ type: "completed", date: task.completion, task });
+    if (task.isCancelled || task.cancelled) {
+      rows.push({
+        type: "cancelled",
+        date: task.cancelled || task.created || task.dailyDate || todayStr(),
+        task,
+      });
+    }
+  }
+  return rows
+    .filter((row) => row.date)
+    .sort((a, b) => b.date.localeCompare(a.date) || a.task.path.localeCompare(b.task.path) || a.task.lineNo - b.task.lineNo)
+    .slice(0, 20);
 }
 
 function sortOpenTasks(tasks) {
@@ -320,8 +343,8 @@ async function readBody(req) {
 
 async function getDashboardPayload() {
   const tasks = await readAllTasks();
-  const open = sortOpenTasks(tasks.filter((task) => !task.checked));
-  const done = sortDoneTasks(tasks.filter((task) => task.checked)).slice(0, 50);
+  const open = sortOpenTasks(tasks.filter((task) => !task.checked && !task.isCancelled));
+  const done = sortDoneTasks(tasks.filter((task) => task.checked && !task.isCancelled)).slice(0, 50);
   const ddl = [...open]
     .filter((task) => task.due)
     .sort((a, b) => a.due.localeCompare(b.due) || priorityScore(b) - priorityScore(a));
@@ -333,6 +356,7 @@ async function getDashboardPayload() {
     open,
     ddl,
     done,
+    activity: buildActivity(tasks),
   };
 }
 
@@ -344,8 +368,15 @@ async function toggleTask(body) {
   if (index < 0 || index >= lines.length) throw new Error("Task line is out of range.");
   if (lines[index] !== body.line) throw new Error("Source line changed. Refresh before retrying.");
   const replacement = body.checked
-    ? lines[index].replace("- [ ]", `- [x] ${DONE_MARK} ${todayStr()}`)
-    : lines[index].replace("- [x]", "- [ ]").replace(new RegExp(`\\s${DONE_MARK}\\s\\d{4}-\\d{2}-\\d{2}`), "");
+    ? lines[index]
+        .replace(/^(\s*)- \[( |x|-)\]/, "$1- [x]")
+        .replace(new RegExp(`\\s${CANCEL_MARK}\\s\\d{4}-\\d{2}-\\d{2}`, "g"), "")
+        .replace(new RegExp(`\\s${DONE_MARK}\\s\\d{4}-\\d{2}-\\d{2}`, "g"), "")
+        .concat(` ${DONE_MARK} ${todayStr()}`)
+    : lines[index]
+        .replace(/^(\s*)- \[( |x|-)\]/, "$1- [ ]")
+        .replace(new RegExp(`\\s${DONE_MARK}\\s\\d{4}-\\d{2}-\\d{2}`, "g"), "")
+        .replace(new RegExp(`\\s${CANCEL_MARK}\\s\\d{4}-\\d{2}-\\d{2}`, "g"), "");
   lines[index] = replacement;
   await fs.writeFile(abs, lines.join("\n"), "utf8");
   return { ok: true };

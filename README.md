@@ -60,6 +60,8 @@ EasyTasks 适合希望在 Obsidian 内构建可用任务系统、但不想从零
   - Development skill for extending the package.
 - `skills/obsidian-easytasks-maintenance/SKILL.md`
   - Maintenance skill for troubleshooting and upkeep.
+- `skills/obsidian-easytasks-repo-sync/SKILL.md`
+  - Synchronization skill for mirroring generic WRITINGS updates into EasyTasks.
 
 ## Directory Layout | 目录结构
 
@@ -71,7 +73,9 @@ EasyTasks/
 ├─ skills/
 │  ├─ obsidian-easytasks-dev/
 │  │  └─ SKILL.md
-│  └─ obsidian-easytasks-maintenance/
+│  ├─ obsidian-easytasks-maintenance/
+│  │  └─ SKILL.md
+│  └─ obsidian-easytasks-repo-sync/
 │     └─ SKILL.md
 └─ starter-kit/
    ├─ .obsidian/
@@ -488,12 +492,14 @@ Use:
 - `docs/DEVELOPMENT_WORKFLOW.md`
 - `skills/obsidian-easytasks-dev/SKILL.md`
 - `skills/obsidian-easytasks-maintenance/SKILL.md`
+- `skills/obsidian-easytasks-repo-sync/SKILL.md`
 
 维护时建议配合使用：
 
 - `docs/DEVELOPMENT_WORKFLOW.md`
 - `skills/obsidian-easytasks-dev/SKILL.md`
 - `skills/obsidian-easytasks-maintenance/SKILL.md`
+- `skills/obsidian-easytasks-repo-sync/SKILL.md`
 
 ## Known Limits | 已知限制
 

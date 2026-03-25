@@ -3,73 +3,240 @@
   --dash-soft: color-mix(in srgb, var(--interactive-accent) 18%, var(--background-primary) 82%);
 }
 
-.dashboard-hero {
-  border: 1px solid color-mix(in srgb, var(--interactive-accent) 35%, var(--background-modifier-border) 65%);
-  border-radius: 16px;
-  padding: 14px 16px;
-  margin: 4px 0 10px 0;
+.workspace-leaf-content[data-path$="Task Dashboard.md"] .markdown-preview-view {
+  --taskdash-cobalt: #2563eb;
+  --taskdash-emerald: #0f766e;
+  --taskdash-amber: #d97706;
+  --taskdash-rose: #dc2626;
+}
+
+.workspace-leaf-content[data-path$="Task Dashboard.md"] .markdown-preview-view h2 {
+  margin-top: 1.6em;
+  padding: 0.75rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--interactive-accent) 20%, var(--background-modifier-border) 80%);
+  border-radius: 18px;
   background:
-    radial-gradient(circle at 85% 18%, color-mix(in srgb, var(--interactive-accent) 26%, transparent) 0%, transparent 45%),
-    linear-gradient(145deg, var(--dash-soft), var(--background-secondary));
+    radial-gradient(circle at 92% 18%, color-mix(in srgb, var(--interactive-accent) 14%, transparent) 0%, transparent 36%),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--background-primary) 94%, white 6%),
+      color-mix(in srgb, var(--background-secondary) 96%, transparent)
+    );
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--background-modifier-border) 34%, transparent);
+}
+
+.workspace-leaf-content[data-path$="Task Dashboard.md"] .markdown-preview-view h3 {
+  margin-top: 1.15em;
+}
+
+.workspace-leaf-content[data-path$="Task Dashboard.md"] .markdown-preview-view .HyperMD-quote,
+.workspace-leaf-content[data-path$="Task Dashboard.md"] .markdown-preview-view blockquote {
+  border-left-color: color-mix(in srgb, var(--interactive-accent) 42%, var(--background-modifier-border) 58%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--background-secondary) 90%, transparent),
+    color-mix(in srgb, var(--background-primary) 95%, transparent)
+  );
+  border-radius: 0 14px 14px 0;
+  padding-top: 0.55rem;
+  padding-bottom: 0.55rem;
+}
+
+.workspace-leaf-content[data-path$="Task Dashboard.md"] .markdown-preview-view .mod-callout[data-callout="summary"] {
+  border-radius: 18px;
+  border-color: color-mix(in srgb, var(--interactive-accent) 26%, var(--background-modifier-border) 74%);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--background-modifier-border) 30%, transparent);
+  background:
+    radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--interactive-accent) 18%, transparent) 0%, transparent 34%),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--background-primary) 93%, white 7%),
+      color-mix(in srgb, var(--background-secondary) 96%, transparent)
+    );
+}
+
+.task-dashboard {
+  --taskdash-cobalt: #2563eb;
+  --taskdash-emerald: #0f766e;
+  --taskdash-amber: #d97706;
+  --taskdash-rose: #dc2626;
+}
+
+.dashboard-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--interactive-accent) 26%, var(--background-modifier-border) 74%);
+  border-radius: 24px;
+  padding: 20px 20px 18px;
+  margin: 4px 0 14px 0;
+  background:
+    radial-gradient(circle at 82% 14%, color-mix(in srgb, var(--interactive-accent) 22%, transparent) 0%, transparent 34%),
+    radial-gradient(circle at 8% 92%, rgba(37, 99, 235, 0.16) 0%, transparent 38%),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--background-primary) 88%, #0f172a 12%),
+      color-mix(in srgb, var(--background-secondary) 88%, var(--interactive-accent) 12%)
+    );
+  box-shadow: 0 18px 46px color-mix(in srgb, var(--background-modifier-border) 48%, transparent);
+}
+
+.dashboard-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.06) 24%, transparent 48%);
+}
+
+.dashboard-hero > * {
+  position: relative;
 }
 
 .dashboard-hero-date {
   color: var(--text-muted);
-  font-size: 0.82em;
-  letter-spacing: 0.02em;
+  font-size: 0.8em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .dashboard-hero-title {
-  margin-top: 4px;
-  font-size: 1.26em;
-  font-weight: 760;
+  margin-top: 6px;
+  font-size: 1.5em;
+  font-weight: 820;
+  letter-spacing: 0.01em;
 }
 
 .dashboard-hero-meta {
-  margin-top: 5px;
+  margin-top: 8px;
   color: var(--text-normal);
-  font-size: 0.92em;
+  max-width: 760px;
+  font-size: 0.93em;
+  line-height: 1.55;
 }
 
 .dashboard-chip-wrap {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 8px;
-  margin: 0 0 14px 0;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 0 0 16px 0;
 }
 
 .dashboard-chip {
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 10px;
-  padding: 7px 9px;
-  background: var(--background-primary);
+  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent);
+  border-radius: 18px;
+  padding: 12px 13px;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--background-primary) 92%, white 8%),
+    color-mix(in srgb, var(--background-secondary) 96%, transparent)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 10px 24px color-mix(in srgb, var(--background-modifier-border) 40%, transparent);
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 8px;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.dashboard-chip:hover,
+.dashboard-focus-card:hover,
+.task-dashboard-create:hover,
+.fixed-task-admin:hover,
+.fixed-task-item:hover,
+.fixed-task-stat-card:hover,
+.task-activity-row:hover,
+.task-progress-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px color-mix(in srgb, var(--background-modifier-border) 46%, transparent);
+  border-color: color-mix(in srgb, var(--interactive-accent) 24%, var(--background-modifier-border) 76%);
 }
 
 .dashboard-chip-label {
   color: var(--text-muted);
-  font-size: 0.82em;
+  font-size: 0.8em;
+  letter-spacing: 0.02em;
 }
 
 .dashboard-chip-value {
-  font-size: 1.05em;
-  font-weight: 700;
+  font-size: 1.18em;
+  font-weight: 780;
+}
+
+.dashboard-focus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin: 0 0 18px 0;
+}
+
+.dashboard-focus-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 20px;
+  padding: 14px 14px 15px;
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--background-primary) 94%, var(--interactive-accent) 6%),
+    color-mix(in srgb, var(--background-secondary) 96%, transparent)
+  );
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--background-modifier-border) 44%, transparent);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.dashboard-focus-card::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--taskdash-cobalt), color-mix(in srgb, var(--interactive-accent) 72%, white 28%));
+}
+
+.dashboard-focus-title {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dashboard-focus-value {
+  font-size: 1.56em;
+  font-weight: 820;
+  margin-top: 8px;
+  line-height: 1.1;
+}
+
+.dashboard-focus-note {
+  margin-top: 8px;
+  font-size: 0.84em;
+  color: var(--text-muted);
+  line-height: 1.45;
 }
 
 .task-dashboard-create {
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 14px;
-  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--interactive-accent) 18%, var(--background-modifier-border) 82%);
+  border-radius: 20px;
+  padding: 18px;
   margin-bottom: 18px;
   background: linear-gradient(
     160deg,
-    color-mix(in srgb, var(--background-primary) 90%, var(--text-accent) 10%),
-    var(--background-primary)
+    color-mix(in srgb, var(--background-primary) 93%, var(--text-accent) 7%),
+    color-mix(in srgb, var(--background-secondary) 96%, transparent)
   );
-  box-shadow: 0 6px 24px color-mix(in srgb, var(--background-modifier-border) 70%, transparent);
+  box-shadow: 0 14px 32px color-mix(in srgb, var(--background-modifier-border) 38%, transparent);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.task-dashboard-create::after,
+.fixed-task-admin::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--taskdash-cobalt), color-mix(in srgb, var(--interactive-accent) 72%, white 28%));
 }
 
 .task-dashboard-hint {
@@ -110,14 +277,21 @@
 
 .task-dashboard-input {
   width: 100%;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
-  padding: 6px 8px;
+  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 82%, transparent);
+  border-radius: 12px;
+  padding: 8px 10px;
   background: var(--background-primary);
+  transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+.task-dashboard-input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--interactive-accent) 40%, var(--background-modifier-border) 60%);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--interactive-accent) 12%, transparent);
 }
 
 .task-dashboard-title {
-  min-height: 40px;
+  min-height: 42px;
 }
 
 .task-dashboard-actions {
@@ -129,23 +303,32 @@
 
 .task-dashboard-btn {
   border: 1px solid var(--interactive-accent);
-  border-radius: 8px;
-  background: var(--interactive-accent);
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--interactive-accent), color-mix(in srgb, var(--interactive-accent) 72%, white 28%));
   color: var(--text-on-accent);
-  padding: 6px 10px;
+  padding: 7px 12px;
   cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease, border-color 140ms ease;
+}
+
+.task-dashboard-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--interactive-accent) 30%, transparent);
+  filter: saturate(1.04);
 }
 
 .task-dashboard-btn-secondary {
   background: transparent;
   color: var(--text-normal);
   border-color: var(--background-modifier-border);
+  box-shadow: none;
 }
 
 .task-dashboard-btn-danger {
   background: transparent;
   border-color: #dc2626;
   color: #dc2626;
+  box-shadow: none;
 }
 
 .task-dashboard-status {
@@ -156,11 +339,19 @@
 }
 
 .fixed-task-admin {
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 14px;
-  padding: 14px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--interactive-accent) 16%, var(--background-modifier-border) 84%);
+  border-radius: 20px;
+  padding: 16px;
   margin: 16px 0;
-  background: var(--background-secondary);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--background-primary) 93%, white 7%),
+    color-mix(in srgb, var(--background-secondary) 96%, transparent)
+  );
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--background-modifier-border) 34%, transparent);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
 }
 
 .fixed-task-admin-row {
@@ -184,16 +375,19 @@
 
 .fixed-task-item {
   border: 1px solid var(--background-modifier-border);
-  border-radius: 10px;
-  padding: 10px;
+  border-radius: 14px;
+  padding: 12px;
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px;
   align-items: center;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--background-primary) 94%, white 6%), var(--background-secondary));
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--background-modifier-border) 20%, transparent);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
 }
 
 .fixed-task-title {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .fixed-task-meta {
@@ -209,14 +403,18 @@
 }
 
 .fixed-task-stat-card {
+  position: relative;
+  overflow: hidden;
   border: 1px solid var(--background-modifier-border);
-  border-radius: 10px;
-  padding: 10px;
-  background: var(--background-primary);
+  border-radius: 14px;
+  padding: 12px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--background-primary) 94%, white 6%), var(--background-secondary));
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--background-modifier-border) 20%, transparent);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
 }
 
 .fixed-task-stat-title {
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 6px;
 }
 
@@ -228,18 +426,19 @@
 }
 
 .task-kpi-card {
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 14px;
-  padding: 12px;
-  background: var(--background-secondary);
   position: relative;
   overflow: hidden;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 16px;
+  padding: 12px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--background-primary) 94%, white 6%), var(--background-secondary));
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--background-modifier-border) 20%, transparent);
   transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
 }
 
 .task-kpi-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px color-mix(in srgb, var(--background-modifier-border) 60%, transparent);
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--background-modifier-border) 28%, transparent);
   border-color: color-mix(in srgb, var(--interactive-accent) 32%, var(--background-modifier-border) 68%);
 }
 
@@ -249,7 +448,7 @@
   left: 0;
   bottom: 0;
   width: 100%;
-  height: 3px;
+  height: 4px;
   background: var(--background-modifier-border);
 }
 
@@ -260,7 +459,7 @@
 
 .task-kpi-value {
   font-size: 1.5em;
-  font-weight: 700;
+  font-weight: 780;
   margin-top: 4px;
 }
 
@@ -292,12 +491,14 @@
 
 .task-progress-row {
   border: 1px solid var(--background-modifier-border);
-  border-radius: 12px;
-  padding: 8px 10px 10px 10px;
-  background: var(--background-secondary);
+  border-radius: 16px;
+  padding: 10px 12px 12px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--background-primary) 94%, white 6%), var(--background-secondary));
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--background-modifier-border) 20%, transparent);
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 6px 10px;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
 }
 
 .task-progress-label {
@@ -341,6 +542,81 @@
   background: #0f766e;
 }
 
+.task-activity-board {
+  display: grid;
+  gap: 10px;
+}
+
+.task-activity-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: start;
+  padding: 12px 14px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 16px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--background-primary) 94%, white 6%), var(--background-secondary));
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--background-modifier-border) 22%, transparent);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.task-activity-badge {
+  min-width: 64px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78em;
+  font-weight: 700;
+  text-align: center;
+}
+
+.task-activity-badge.created {
+  background: color-mix(in srgb, #2563eb 14%, var(--background-primary));
+  color: #2563eb;
+}
+
+.task-activity-badge.completed {
+  background: color-mix(in srgb, #16a34a 14%, var(--background-primary));
+  color: #15803d;
+}
+
+.task-activity-badge.cancelled {
+  background: color-mix(in srgb, #dc2626 14%, var(--background-primary));
+  color: #b91c1c;
+}
+
+.task-activity-text {
+  line-height: 1.5;
+}
+
+.task-activity-text.cancelled {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.task-activity-meta {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.workspace-leaf-content[data-path$="Task Dashboard.md"] .markdown-preview-view .dataview.task-list-basic-item,
+.workspace-leaf-content[data-path$="Task Dashboard.md"] .markdown-preview-view ul.contains-task-list li.task-list-item {
+  margin: 0.3rem 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 84%, transparent);
+  border-radius: 14px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--background-primary) 95%, white 5%), var(--background-secondary));
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--background-modifier-border) 18%, transparent);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.workspace-leaf-content[data-path$="Task Dashboard.md"] .markdown-preview-view .dataview.task-list-item:hover,
+.workspace-leaf-content[data-path$="Task Dashboard.md"] .markdown-preview-view ul.contains-task-list li.task-list-item:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--interactive-accent) 24%, var(--background-modifier-border) 76%);
+  box-shadow: 0 12px 22px color-mix(in srgb, var(--background-modifier-border) 24%, transparent);
+}
+
 @media (max-width: 700px) {
   .task-dashboard-row-meta {
     grid-template-columns: 1fr;
@@ -350,8 +626,22 @@
     grid-template-columns: 1fr;
   }
 
-  .fixed-task-item {
+  .fixed-task-item,
+  .task-activity-row {
     grid-template-columns: 1fr;
+  }
+
+  .task-activity-meta {
+    white-space: normal;
+  }
+
+  .dashboard-chip-wrap,
+  .dashboard-focus-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-hero {
+    padding: 18px 16px;
   }
 }
 
@@ -363,7 +653,8 @@
   .task-progress-row,
   .dashboard-chip,
   .fixed-task-stat-card,
-  .fixed-task-item {
+  .fixed-task-item,
+  .task-activity-row {
     break-inside: avoid;
     page-break-inside: avoid;
     -webkit-print-color-adjust: exact;
@@ -374,6 +665,7 @@
     border-color: #666 !important;
     color: #222 !important;
     background: #f5f5f5 !important;
+    box-shadow: none !important;
   }
 
   .task-progress-track {

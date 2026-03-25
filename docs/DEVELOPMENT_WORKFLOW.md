@@ -25,6 +25,23 @@ This workflow is for maintaining the generic EasyTasks package without re-coupli
    - If yes, update `EasyTasks` immediately, but only with the reusable portion.
    - Do not carry over personal content, vault-only naming, or repository-specific paths unless they are intentionally part of the public starter contract.
 
+## Repository Sync Pass
+
+Use this pass when WRITINGS changed first and `EasyTasks` may need to catch up.
+
+1. Read the latest dated entries in `DOC/Obsidian任务系统执行与维护计划.md`.
+2. Compare the WRITINGS task-system files against their `EasyTasks` counterparts.
+3. Classify each change:
+   - generic and should sync
+   - vault-specific and should stay in WRITINGS only
+   - already synced
+4. If a maintenance rule or synchronization rule changed, update:
+   - `EasyTasks/skills/obsidian-easytasks-dev/SKILL.md`
+   - `EasyTasks/skills/obsidian-easytasks-maintenance/SKILL.md`
+   - `EasyTasks/skills/obsidian-easytasks-repo-sync/SKILL.md`
+   - `EasyTasks/docs/DEVELOPMENT_WORKFLOW.md`
+5. Record the sync in the WRITINGS maintenance note in the same turn.
+
 ## Change Process
 
 1. Read `EasyTasks/README.md` first.
@@ -37,6 +54,7 @@ This workflow is for maintaining the generic EasyTasks package without re-coupli
    - `EasyTasks/README.md`
    - `EasyTasks/docs/DEVELOPMENT_WORKFLOW.md`
    - the related skill file under `EasyTasks/skills/`
+   - `EasyTasks/skills/obsidian-easytasks-repo-sync/SKILL.md` when sync policy changes
 6. Run lightweight verification:
    - JSON parses
    - `node --check` passes for `sync-dashboard/server.js`
@@ -50,3 +68,4 @@ This workflow is for maintaining the generic EasyTasks package without re-coupli
 - HTML dashboard still reads and writes markdown files.
 - README installation steps still match the actual file tree.
 - Any generic WRITINGS-side improvement has either been synced into `EasyTasks` or explicitly rejected as vault-specific.
+- Repository-sync instructions still describe the current WRITINGS-to-EasyTasks maintenance process.

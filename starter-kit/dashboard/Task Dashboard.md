@@ -38,7 +38,9 @@ const fixedOpen = open.filter((task) => textOf(task).includes("#DAILYFIXED"));
 const createdToday = tasks.filter((task) => dateKey(task.created) === today && !textOf(task).includes("#DAILYFIXED")).length;
 const doneToday = done.filter((task) => dateKey(task.completion) === today).length;
 
-const hero = dv.container.createDiv({ cls: "dashboard-hero" });
+const root0 = dv.container;
+root0.classList.add("task-dashboard");
+const hero = root0.createDiv({ cls: "dashboard-hero" });
 hero.createEl("div", { cls: "dashboard-hero-date", text: `Today - ${window.moment().format("YYYY-MM-DD dddd")}` });
 hero.createEl("div", { cls: "dashboard-hero-title", text: "EasyTasks Command Deck" });
 hero.createEl("div", {
@@ -46,7 +48,7 @@ hero.createEl("div", {
   text: `Open ${open.length} - Fixed ${fixedOpen.length} - Done today ${doneToday}`
 });
 
-const chips = dv.container.createDiv({ cls: "dashboard-chip-wrap" });
+const chips = root0.createDiv({ cls: "dashboard-chip-wrap" });
 [
   ["Normal open", open.length - fixedOpen.length],
   ["Fixed open", fixedOpen.length],
@@ -297,24 +299,6 @@ for (const task of tasks) {
   }
 }
 
-const styleId = "easytasks-activity-style-v1";
-let style = document.getElementById(styleId);
-if (!style) {
-  style = document.createElement("style");
-  style.id = styleId;
-  document.head.appendChild(style);
-}
-style.textContent = `
-  .et-activity-board{display:grid;gap:8px}
-  .et-activity-row{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:start;padding:8px 10px;border:1px solid var(--background-modifier-border);border-radius:10px;background:var(--background-secondary)}
-  .et-activity-badge{min-width:64px;padding:2px 8px;border-radius:999px;font-size:.78em;font-weight:700;text-align:center}
-  .et-activity-badge.created{background:color-mix(in srgb,#2563eb 14%,var(--background-primary));color:#2563eb}
-  .et-activity-badge.completed{background:color-mix(in srgb,#16a34a 14%,var(--background-primary));color:#15803d}
-  .et-activity-badge.cancelled{background:color-mix(in srgb,#dc2626 14%,var(--background-primary));color:#b91c1c}
-  .et-activity-text.cancelled{text-decoration:line-through;color:var(--text-muted)}
-  .et-activity-meta{font-size:.8em;color:var(--text-muted)}
-`;
-
 const rows = activity
   .filter((item) => item.date)
   .sort((a, b) => b.date.localeCompare(a.date))
@@ -323,15 +307,15 @@ const rows = activity
 if (!rows.length) {
   dv.el("div", "No recent task activity.", { cls: "task-dashboard-hint" });
 } else {
-  const board = dv.container.createDiv({ cls: "et-activity-board" });
+  const board = dv.container.createDiv({ cls: "task-activity-board" });
   rows.forEach((row) => {
-    const item = board.createDiv({ cls: "et-activity-row" });
-    item.createEl("span", { cls: `et-activity-badge ${row.tone}`.trim(), text: row.label });
+    const item = board.createDiv({ cls: "task-activity-row" });
+    item.createEl("span", { cls: `task-activity-badge ${row.tone}`.trim(), text: row.label });
     item.createEl("div", {
-      cls: `et-activity-text ${row.tone === "cancelled" ? "cancelled" : ""}`.trim(),
+      cls: `task-activity-text ${row.tone === "cancelled" ? "cancelled" : ""}`.trim(),
       text: String(row.task?.text ?? row.task?.visual ?? "")
     });
-    item.createEl("div", { cls: "et-activity-meta", text: row.date });
+    item.createEl("div", { cls: "task-activity-meta", text: row.date });
   });
 }
 ```
